@@ -69,7 +69,7 @@ public abstract class Screen extends JPanel
             {
                 titleBarComponent.setMousePos(event.getX(), event.getY());
                 resizeElement.setMousePos(event.getX(), event.getY());
-                resizeElement.onMove(event);
+                resizeElement.onMove();
                 elements.forEach(e -> e.setMousePos(event.getX(), event.getY()));
             }
 
@@ -102,7 +102,7 @@ public abstract class Screen extends JPanel
         resizeElement.onPaint(customGraphics);
 
         // set cursor
-        if (resizeElement.isHovered())
+        if (resizeElement.isHovered() || resizeElement.isDragging())
             setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
         else
             setCursor(Cursor.getDefaultCursor());

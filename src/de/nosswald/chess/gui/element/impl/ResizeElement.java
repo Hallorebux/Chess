@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 public class ResizeElement extends ButtonElement
 {
     private int posX, posY;
-    boolean dragging;
+    private boolean dragging;
 
     /**
      * @param x      the x position
@@ -39,12 +39,12 @@ public class ResizeElement extends ButtonElement
     {
         super.onPaint(graphics);
 
-        graphics.drawRect(x, y, width, height, isHovered() ? Color.BLACK : new Color(0, 0, 0, 50));
+        graphics.drawRect(x, y, width, height, new Color(0, 0, 0, 50));
     }
 
-    public void onMove(MouseEvent event)
+    public void onMove()
     {
-        boolean dragging = false;
+        dragging = false;
     }
 
     /**
@@ -55,7 +55,6 @@ public class ResizeElement extends ButtonElement
     public void onDrag(MouseEvent event)
     {
         final Frame frame = Chess.getInstance().getFrame();
-
 
         if(isHovered() || dragging)
         {
@@ -86,4 +85,12 @@ public class ResizeElement extends ButtonElement
      */
     @Override
     public void onClick(MouseEvent event) { }
+
+    /**
+     * @return If the resize flag is currently set
+     */
+    public boolean isDragging()
+    {
+        return dragging;
+    }
 }
