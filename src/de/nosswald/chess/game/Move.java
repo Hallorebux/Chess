@@ -1,6 +1,7 @@
 package de.nosswald.chess.game;
 
 import com.sun.istack.internal.Nullable;
+import de.nosswald.chess.Chess;
 import de.nosswald.chess.game.piece.Piece;
 
 /**
@@ -11,6 +12,7 @@ public final class Move
 {
     private final Position from, to;
     private final Flag flag;
+    private final Piece movingPiece;
     @Nullable private final Piece capturedPiece;
 
     /**
@@ -24,7 +26,8 @@ public final class Move
         this.to = to;
         this.capturedPiece = capturedPiece;
 
-        this.flag = Flag.NONE;
+        movingPiece = Chess.getInstance().getBoard().getPiece(from);
+        flag = Flag.NONE;
     }
 
     /**
@@ -39,6 +42,8 @@ public final class Move
         this.to = to;
         this.flag = flag;
         this.capturedPiece = capturedPiece;
+
+        movingPiece = Chess.getInstance().getBoard().getPiece(from);
     }
 
 
@@ -82,5 +87,10 @@ public final class Move
     public Piece getCapturedPiece()
     {
         return capturedPiece;
+    }
+
+    public Piece getMovingPiece()
+    {
+        return movingPiece;
     }
 }

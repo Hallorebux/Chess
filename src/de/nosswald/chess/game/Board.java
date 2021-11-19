@@ -229,8 +229,11 @@ public final class Board
         switch (move.getFlag())
         {
             case PROMOTION:
+                final Piece originalPawn = move.getMovingPiece();
+
+                originalPawn.setPosition(move.getFrom());
                 pieces.remove(oldPiece);
-                pieces.add(new Pawn(oldPiece.getSide(), move.getFrom()));
+                pieces.add(originalPawn);
                 break;
             case EN_PASSANT:
                 capturedPiece.setPosition(new Position(
@@ -239,8 +242,8 @@ public final class Board
                 );
                 break;
             case CASTLING:
-                Piece rightRook = getPiece(new Position(move.getTo().getCol() + 1, move.getTo().getRow()));
-                Rook rook = (Rook) (rightRook == null ?
+                final Piece rightRook = getPiece(new Position(move.getTo().getCol() + 1, move.getTo().getRow()));
+                final Rook rook = (Rook) (rightRook == null ?
                         getPiece(new Position(move.getTo().getCol() - 1, move.getTo().getRow())) : rightRook);
                 rook.setPosition(new Position(rook.getPosition().getCol() == 3 ? 0 : 7, move.getTo().getRow()));
                 break;
