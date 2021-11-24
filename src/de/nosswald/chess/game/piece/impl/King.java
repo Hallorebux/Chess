@@ -68,14 +68,14 @@ public final class King extends Piece
         }
 
         // castling
-        if (this.board.getHistory().stream().noneMatch(m -> m.getFrom().equals(new Position(4, startRow))))
+        if (this.position.getCol() == 4 && this.position.getRow() == startRow && this.board.getHistory().stream().noneMatch(m -> m.getFrom().equals(new Position(4, startRow))))
         {
             // short castle
             if (this.board.getHistory().stream()
                     .noneMatch(m -> m.getFrom().getCol() == 7 && m.getFrom().getRow() == startRow)
                         && this.board.getPiece(new Position(7, startRow)) instanceof Rook
                         && this.board.getPiece(new Position(7, startRow)).getSide() == this.side
-                        && IntStream.range(5, 6)
+                        && IntStream.range(5, 7)
                             .noneMatch(col -> this.board.hasPiece(new Position(col, startRow)))
             )
                 moves.add(new Move(this.position, new Position(6, startRow), Move.Flag.CASTLING, null));

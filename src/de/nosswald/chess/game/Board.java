@@ -8,6 +8,7 @@ import de.nosswald.chess.game.piece.Piece;
 import de.nosswald.chess.game.piece.impl.*;
 import de.nosswald.chess.gui.screen.impl.GameResultScreen;
 import de.nosswald.chess.logger.LoggerLevel;
+import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +33,13 @@ public final class Board
     /**
      * Stores the {@link Side} which moves next
      */
-    private Side nextMove = Side.WHITE;
+    private Side nextSide = Side.WHITE;
 
     /**
      * Stores the {@link Side} which is being controlled by the player
      */
-    private final Side playerSide = Math.random() > .5 ? Side.WHITE : Side.BLACK;
-
+    private final Side playerSide = //Math.random() > .5 ? Side.WHITE : Side.BLACK;
+Side.WHITE;
     /**
      * Stores the {@link OpponentPlayer}
      */
@@ -76,12 +77,9 @@ public final class Board
             }
         });
 
-        Chess.getInstance().getLogger().print(LoggerLevel.INFO, "Added all pieces to the board");
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.INFO, "Player moves %s",
-                playerSide.toString().toLowerCase());
+        Chess.getLogger().print(LoggerLevel.INFO, "Added all pieces to the board");
 
-        // in case the opponent has the first move
-        if (nextMove != playerSide)
+        if (nextSide != playerSide)
             opponentPlayer.awaitResponse();
     }
 
@@ -92,7 +90,7 @@ public final class Board
      */
     public void onClick(Position position)
     {
-        if (nextMove != playerSide || gameOver)
+        if (nextSide != playerSide || gameOver)
             return;
 
         if (selected == null)
@@ -100,10 +98,10 @@ public final class Board
             // select piece
             Piece clicked = getPiece(position);
 
-            if (clicked != null && clicked.getSide() == nextMove)
+            if (clicked != null && clicked.getSide() == nextSide)
             {
                 selected = clicked;
-                Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+                Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                         "Selected %s on %s [%d possible moves]", clicked.getClass().getSimpleName(),
                         position.toString(), clicked.getPossibleMoves().size()
                 );
@@ -116,7 +114,7 @@ public final class Board
                     .filter(m -> m.getTo().equals(position))
                     .findFirst().ifPresent(m ->
                     {
-                        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+                        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                                 "Player moved %s from %s to %s", selected.getClass().getSimpleName(),
                                 selected.getPosition().toString(), m.getTo().toString());
                         makeMove(m, false);
@@ -172,35 +170,31 @@ public final class Board
         }
 
         // flip sides
-        nextMove = nextMove.flip();
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextMove.toString());
+        nextSide = nextSide.flip();
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextSide.toString());
 
         // add to history
-        if (!inSearch)
-        {
+        if (!inSearch) {
             // TODO fifty move counter / repetition position
             history.add(move);
-        }
 
-        /*
-         * !!! THIS SHOULD NOT BE HERE !!!
-         * (used to check if the game is over)
-         */
-        if (isStaleMate() || isCheckMate(nextMove))
-        {
-            gameOver = true;
-            selected = null;
+            /*
+             * !!! THIS SHOULD NOT BE HERE !!!
+             * (used to check if the game is over)
+             */
+            if (isStalemate() || isCheckMate(nextSide)) {
+                gameOver = true;
+                selected = null;
 
-            if (isStaleMate())
-            {
-                nextMove = null; // to identify that the match has ended in a draw
-                Chess.getInstance().getLogger().print(LoggerLevel.INFO, "The match has ended in a draw");
+                if (isStalemate()) {
+                    nextSide = null; // to identify that the match has ended in a draw
+                    Chess.getLogger().print(LoggerLevel.INFO, "The match has ended in a draw");
+                } else
+                    Chess.getLogger().printFormat(LoggerLevel.INFO,
+                            "%s has won the match", nextSide.flip().toString());
+
+                Chess.getInstance().getFrame().setScreen(new GameResultScreen(this));
             }
-            else
-                Chess.getInstance().getLogger().printFormat(LoggerLevel.INFO,
-                        "%s has won the match", nextMove.flip().toString());
-
-            Chess.getInstance().getFrame().setScreen(new GameResultScreen(this));
         }
     }
 
@@ -252,8 +246,8 @@ public final class Board
         }
 
         // set side
-        nextMove = oldPiece.getSide();
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextMove.toString());
+        nextSide = oldPiece.getSide();
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextSide.toString());
 
         if (!inSearch)
         {
@@ -268,15 +262,13 @@ public final class Board
      */
     public boolean isInCheck(Side side)
     {
-        List<Piece> piecesClone = new ArrayList<>(pieces);
-        List<Piece> anotherPiecesClone = new ArrayList<>(pieces);
+        return isAttacked(pieces.stream().filter(p -> p instanceof King && p.getSide() == side).findFirst().get());
+    }
 
-        return piecesClone.stream()
-                .filter(p -> p instanceof King)
-                .anyMatch(k -> anotherPiecesClone.stream()
-                        .filter(p -> p.getSide() != side)
-                        .anyMatch(p -> p.getPossibleMoves().stream()
-                                .anyMatch(m -> k.getPosition().equals(m.getTo()))));
+    public boolean isAttacked(Piece piece) {return isAttacked(piece.getSide().flip(), piece.getPosition());}
+    public boolean isAttacked(Side attacking, Position position)
+    {
+        return new ArrayList<>(pieces).stream().filter(p -> p.getSide() == attacking).anyMatch(p -> p.getPossibleMoves().stream().anyMatch(m -> m.getTo().equals(position)));
     }
 
     /**
@@ -295,13 +287,13 @@ public final class Board
     /**
      * @return If both sides are unable to move or only both {@link King}'s are alive
      */
-    private boolean isStaleMate()
+    public boolean isStalemate()
     {
         List<Piece> piecesClone = new ArrayList<>(pieces);
 
         return pieces.size() == 2 || piecesClone.stream()
-                .filter(p -> p.getSide() == nextMove)
-                .allMatch(p -> p.getPossibleMoves().isEmpty()) && !isInCheck(nextMove);
+                .filter(p -> p.getSide() == nextSide)
+                .allMatch(p -> p.getPossibleMoves().isEmpty()) && !isInCheck(nextSide);
     }
 
     /**
@@ -342,9 +334,9 @@ public final class Board
     /**
      * @return The {@link Side} which moves next
      */
-    public Side getNextMove()
+    public Side getNextSide()
     {
-        return nextMove;
+        return nextSide;
     }
 
     /**
@@ -363,5 +355,33 @@ public final class Board
     public boolean isLegitimacyChecking()
     {
         return legitimacyChecking;
+    }
+
+    public boolean isBoardValid(){
+        boolean hasOverlappingPieces = new ArrayList(pieces).stream()
+                .anyMatch(pieceA -> pieces.stream()
+                        .anyMatch(pieceB -> pieceA != pieceB && ((Piece)pieceA).getPosition().equals(pieceB.getPosition())));
+
+        if (hasOverlappingPieces) return false;
+
+        long blackPieces = pieces.stream().filter(p -> p.getSide() == Side.BLACK).count();
+        long whitePieces = pieces.stream().filter(p -> p.getSide() == Side.WHITE).count();
+
+        if (blackPieces > 16) return false;
+        if (whitePieces > 16) return false;
+
+        long blackKings = pieces.stream().filter(p -> p.getSide() == Side.BLACK && p instanceof King).count();
+        long whiteKings = pieces.stream().filter(p -> p.getSide() == Side.WHITE && p instanceof King).count();
+
+        if (blackKings != 1) return false;
+        if (whiteKings != 1) return false;
+
+        long blackPawns = pieces.stream().filter(p -> p.getSide() == Side.BLACK && p instanceof Pawn).count();
+        long whitePawns = pieces.stream().filter(p -> p.getSide() == Side.WHITE && p instanceof Pawn).count();
+
+        if (blackPawns > 8) return false;
+        if (whitePawns > 8) return false;
+
+        return true;
     }
 }

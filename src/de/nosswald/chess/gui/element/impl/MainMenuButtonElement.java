@@ -53,7 +53,7 @@ public final class MainMenuButtonElement extends ButtonElement
                 .collect(HashMap<Integer, BufferedImage>::new, (map, fileName) -> {
                     try {map.put(map.size(), ImageIO.read(new ResourceLocation(fileName, ResourceLocation.Type.PIECE).getFile()));}
                     catch (IOException e) {
-                        Chess.getInstance().getLogger().printFormat(LoggerLevel.ERROR, "Image for %s not found!\n%s",
+                        Chess.getLogger().printFormat(LoggerLevel.ERROR, "Image for %s not found!\n%s",
                                 getClass().getSimpleName(), e.getMessage());
                     }
                 }, (i, j) -> { }).forEach((i, image) ->

@@ -20,7 +20,7 @@ public final class GameResultScreen extends Screen
 {
     public GameResultScreen(Board board)
     {
-        final String message = board.getNextMove() != null ? board.getNextMove().flip() + " has won the match" : "Stalemate";
+        final String message = board.getNextSide() != null ? board.getNextSide().flip() + " has won the match" : "Stalemate";
 
         this.elements.add(
                 new LabelElement(message, new RelativeSize(0), new AbsoluteSize(30), new RelativeSize(1), new RelativeSize(.15F), Anchor.CENTER, Anchor.CENTER)

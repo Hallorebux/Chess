@@ -42,7 +42,7 @@ public final class OpponentPlayer
                 .findFirst().orElse(null);
 
         // send the move to the board
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                 "AI moved %s from %s to %s", piece.getClass().getSimpleName(),
                 piece.getPosition(), move.getTo().toString()
         );

@@ -23,11 +23,11 @@ public final class Frame extends JFrame
         final int frameWidth = (int)(screenSize.width * .5F);
         final int frameHeight = (int)(screenSize.height * .65F);
 
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                 "Determined screen size: %dx%d", (int)screenSize.getWidth(), (int)screenSize.getHeight());
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                 "Determined screen resolution: %d", screenResolution);
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                 "Using frame size of %dx%d", frameWidth, frameHeight);
 
         this.setTitle(Chess.APP_NAME);
@@ -37,7 +37,7 @@ public final class Frame extends JFrame
         if (!Chess.DEBUG_MODE) this.setUndecorated(true);
         this.setLayout(null);
 
-        Chess.getInstance().getLogger().print(LoggerLevel.INFO, "Successfully created game frame");
+        Chess.getLogger().print(LoggerLevel.INFO, "Successfully created game frame");
         this.setVisible(true);
     }
 
@@ -48,7 +48,7 @@ public final class Frame extends JFrame
      */
     public void setScreen(@NotNull Screen screen)
     {
-        Chess.getInstance().getLogger().printFormat(LoggerLevel.DEBUG,
+        Chess.getLogger().printFormat(LoggerLevel.DEBUG,
                 "Switching screen to %s..", screen.getClass().getSimpleName());
 
         currentScreen = screen;

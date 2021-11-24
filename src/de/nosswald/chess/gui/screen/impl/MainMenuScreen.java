@@ -14,10 +14,12 @@ public final class MainMenuScreen extends Screen
 {
     public MainMenuScreen()
     {
+        Board board = new Board();
         this.elements.add(
                 new MainMenuButtonElement("New Game", new RelativeSize(.25F), new RelativeSize(.25F), new RelativeSize(.5F), new RelativeSize(.1F))
                         .setAction(() -> {
-                            Chess.getInstance().setBoard(new Board());
+                            Chess.getInstance().setBoard(board);
+                            board.initialize();
                             Chess.getInstance().getFrame().setScreen(new BoardScreen());
                         }
         ));

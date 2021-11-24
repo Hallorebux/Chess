@@ -49,7 +49,7 @@ public abstract class Piece
         }
         catch (IOException e)
         {
-            Chess.getInstance().getLogger().printFormat(LoggerLevel.ERROR, "Image for %s not found!\n%s",
+            Chess.getLogger().printFormat(LoggerLevel.ERROR, "Image for %s not found!\n%s",
                     getClass().getSimpleName(), e.getMessage());
         }
     }
@@ -116,39 +116,38 @@ public abstract class Piece
         for (Move pseudoLegalMove : pseudoLegalMoves)
         {
             // check if castling is possible
-            if (this instanceof King && !board.isInCheck(side))
+            // TODO idk if this works just check if move has castling flag
+            Chess.getLogger().printFormat(LoggerLevel.DEBUG, "Checking castling for %s", side);
+            if (this instanceof King && !board.isAttacked(this) && pseudoLegalMove.getFlag() == Move.Flag.CASTLING)
             {
                 final int startRow = side == Side.WHITE ? 7 : 0;
 
                 // short castle
                 if (pseudoLegalMove.getTo().equals(new Position(6, startRow)))
                 {
-                    if (!IntStream.range(5, 6)
+                    if (IntStream.range(4, 7) // 7 because endExclusive
                             .anyMatch(col -> board.getPieces().stream()
                                     .filter(p -> p.side != side)
                                     .anyMatch(p -> p.getPossibleMoves().stream()
                                             .anyMatch(m -> m.getTo().equals(new Position(col, startRow)))))
                     )
-                        legalMoves.add(pseudoLegalMove);
-
-                    continue;
+                        continue;
                 }
 
                 // long castle
                 if (pseudoLegalMove.getTo().equals(new Position(2, startRow)))
                 {
-                    if (!IntStream.range(1, 3)
+                    if (IntStream.range(1, 4)
                             .anyMatch(col -> board.getPieces().stream()
                                     .filter(p -> p.side != side)
                                     .anyMatch(p -> p.getPossibleMoves().stream()
                                             .anyMatch(m -> m.getTo().equals(new Position(col, startRow)))))
                     )
-                        legalMoves.add(pseudoLegalMove);
-
-                    continue;
+                        continue;
                 }
             }
 
+            Chess.getLogger().printFormat(LoggerLevel.DEBUG, "Testing move of %s from %s to %s", pseudoLegalMove.getMovingPiece(), pseudoLegalMove.getFrom(), pseudoLegalMove.getTo());
             // check if move is legal
             board.makeMove(pseudoLegalMove, true);
             if (!board.isInCheck(side))
@@ -158,6 +157,7 @@ public abstract class Piece
 
         board.setLegitimacyChecking(true);
 
+        legalMoves.forEach(pseudoLegalMove -> Chess.getLogger().printFormat(LoggerLevel.DEBUG, "flag: %s - from: %s - to: %s", pseudoLegalMove.getFlag(), pseudoLegalMove.getFrom(), pseudoLegalMove.getTo()));
         return legalMoves;
     }
 
