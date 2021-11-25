@@ -118,8 +118,12 @@ public abstract class Piece
             // check if castling is possible
             // TODO idk if this works just check if move has castling flag
             Chess.getLogger().printFormat(LoggerLevel.DEBUG, "Checking castling for %s", side);
-            if (this instanceof King && !board.isAttacked(this) && pseudoLegalMove.getFlag() == Move.Flag.CASTLING)
+            if (this instanceof King && pseudoLegalMove.getFlag() == Move.Flag.CASTLING)
             {
+                // castling not allowed if king is attacked
+                if (board.isAttacked(this))
+                    continue;
+
                 final int startRow = side == Side.WHITE ? 7 : 0;
 
                 // short castle
