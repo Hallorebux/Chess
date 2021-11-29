@@ -1,6 +1,10 @@
 package de.nosswald.chess;
 
 import de.nosswald.chess.game.Board;
+import de.nosswald.chess.game.Position;
+import de.nosswald.chess.game.Side;
+import de.nosswald.chess.game.piece.Piece;
+import de.nosswald.chess.game.piece.impl.*;
 import de.nosswald.chess.gui.Frame;
 import de.nosswald.chess.gui.screen.impl.BoardScreen;
 import de.nosswald.chess.gui.screen.impl.MainMenuScreen;
@@ -57,6 +61,31 @@ public final class Chess
 
         frame = new Frame();
         frame.setScreen(new BoardScreen());
+    }
+
+    public static void printBoard(Board board)
+    {
+        for (int r = 0; r < 8; r++)
+        {
+            System.out.println("----------------");
+            for (int c = 0; c < 8; c++)
+            {
+                System.out.print('|');
+                Piece p = board.getPiece(new Position(c, r));
+                char pc = p instanceof King ? 'K'
+                        : p instanceof Rook ? 'R'
+                        : p instanceof Knight ? 'N'
+                        : p instanceof Bishop ? 'B'
+                        : p instanceof Queen ? 'Q'
+                        : p instanceof Pawn ? 'P'
+                        : ' ';
+                if (p != null && p.getSide() == Side.BLACK)
+                    pc = Character.toLowerCase(pc);
+                System.out.print(pc);
+            }
+            System.out.println('|');
+        }
+        System.out.println("----------------");
     }
 
     public static Logger getLogger()

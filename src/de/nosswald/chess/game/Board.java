@@ -22,7 +22,7 @@ public final class Board
 {
     public static long getBitboard(Stream<Piece> pieceStream)
     {
-        return pieceStream.map(p -> (long)p.getPosition().getRow() * 8L + (long)p.getPosition().getCol())
+        return pieceStream.map(p -> (long)(7 - p.getPosition().getRow()) * 8L + (long)p.getPosition().getCol())
                 .map(i -> 1L << i)
                 .collect(() -> new Long[]{0L}, (a, b) -> a[0] = a[0] | b, (a, b) -> a[0] = a[0] | b[0])[0];
     }
