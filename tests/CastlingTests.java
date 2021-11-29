@@ -4,6 +4,7 @@ import de.nosswald.chess.game.Move;
 import de.nosswald.chess.game.Position;
 import de.nosswald.chess.game.Side;
 import de.nosswald.chess.game.piece.impl.King;
+import de.nosswald.chess.game.piece.impl.Queen;
 import de.nosswald.chess.game.piece.impl.Rook;
 import org.junit.jupiter.api.*;
 
@@ -31,6 +32,19 @@ public class CastlingTests
     {
         King k = new King(Side.WHITE, new Position(3, 7));
         Rook r = new Rook(Side.WHITE, new Position(0, 7));
+        board.getPieces().add(k);
+        board.getPieces().add(r);
+        board.getPieces().add(new King(Side.BLACK, new Position(3, 0)));
+
+        long count = k.getPossibleMoves().stream().filter(p -> p.getFlag() == Move.Flag.CASTLING).count();
+        Assertions.assertEquals(0, count);
+    }
+
+    @Test
+    public void longCastleBasicInvalidPiece()
+    {
+        King k = new King(Side.WHITE, new Position(4, 7));
+        Queen r = new Queen(Side.WHITE, new Position(0, 7));
         board.getPieces().add(k);
         board.getPieces().add(r);
         board.getPieces().add(new King(Side.BLACK, new Position(3, 0)));
@@ -140,6 +154,19 @@ public class CastlingTests
     {
         King k = new King(Side.WHITE, new Position(3, 7));
         Rook r = new Rook(Side.WHITE, new Position(7, 7));
+        board.getPieces().add(k);
+        board.getPieces().add(r);
+        board.getPieces().add(new King(Side.BLACK, new Position(3, 0)));
+
+        long count = k.getPossibleMoves().stream().filter(p -> p.getFlag() == Move.Flag.CASTLING).count();
+        Assertions.assertEquals(0, count);
+    }
+
+    @Test
+    public void shortCastleBasicInvalidPiece()
+    {
+        King k = new King(Side.WHITE, new Position(4, 7));
+        Queen r = new Queen(Side.WHITE, new Position(7, 7));
         board.getPieces().add(k);
         board.getPieces().add(r);
         board.getPieces().add(new King(Side.BLACK, new Position(3, 0)));

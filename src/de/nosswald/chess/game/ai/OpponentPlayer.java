@@ -33,7 +33,7 @@ public final class OpponentPlayer
     {
         // perform first possible move
         final Board board = Chess.getInstance().getBoard();
-        final List<Piece> piecesClone = new ArrayList(board.getPieces());
+        final List<Piece> piecesClone = new ArrayList<>(board.getPieces());
         final Piece piece = piecesClone
                 .stream().filter(p -> p.getSide() == side)
                 .filter(p -> !p.getPossibleMoves().isEmpty())

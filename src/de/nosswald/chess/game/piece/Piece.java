@@ -135,7 +135,8 @@ public abstract class Piece
                                     .anyMatch(p -> p.getPossibleMoves().stream()
                                             .anyMatch(m -> m.getTo().equals(new Position(col, startRow)))))
                     )
-                        continue;
+                        legalMoves.add(pseudoLegalMove);
+                    continue;
                 }
 
                 // long castle
@@ -147,7 +148,8 @@ public abstract class Piece
                                     .anyMatch(p -> p.getPossibleMoves().stream()
                                             .anyMatch(m -> m.getTo().equals(new Position(col, startRow)))))
                     )
-                        continue;
+                        legalMoves.add(pseudoLegalMove);
+                    continue;
                 }
             }
 

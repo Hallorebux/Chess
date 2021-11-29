@@ -8,11 +8,11 @@ import de.nosswald.chess.game.piece.Piece;
 import de.nosswald.chess.game.piece.impl.*;
 import de.nosswald.chess.gui.screen.impl.GameResultScreen;
 import de.nosswald.chess.logger.LoggerLevel;
-import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author Nils Osswald
@@ -20,15 +20,22 @@ import java.util.stream.IntStream;
  */
 public final class Board
 {
+    public static long getBitboard(Stream<Piece> pieceStream)
+    {
+        return pieceStream.map(p -> (long)p.getPosition().getRow() * 8L + (long)p.getPosition().getCol())
+                .map(i -> 1L << i)
+                .collect(() -> new Long[]{0L}, (a, b) -> a[0] = a[0] | b, (a, b) -> a[0] = a[0] | b[0])[0];
+    }
+
     /**
      * Contains every {@link Piece} on the {@link Board}
      */
-    private final List<Piece> pieces = new ArrayList<>();
+    private final ArrayList<Piece> pieces = new ArrayList<>();
 
     /**
      * Contains every {@link Move} that has been done on the yet
      */
-    private final List<Move> history = new ArrayList<>();
+    private final ArrayList<Move> history = new ArrayList<>();
 
     /**
      * Stores the {@link Side} which moves next
@@ -173,11 +180,10 @@ Side.WHITE;
         nextSide = nextSide.flip();
         Chess.getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextSide.toString());
 
+        history.add(move);
         // add to history
         if (!inSearch) {
             // TODO fifty move counter / repetition position
-            history.add(move);
-
             /*
              * !!! THIS SHOULD NOT BE HERE !!!
              * (used to check if the game is over)
@@ -237,7 +243,7 @@ Side.WHITE;
                 break;
             case CASTLING:
                 final Piece rightRook = getPiece(new Position(move.getTo().getCol() + 1, move.getTo().getRow()));
-                final Rook rook = (Rook) (rightRook == null ?
+                final Rook rook = (Rook) (rightRook instanceof Rook ?
                         getPiece(new Position(move.getTo().getCol() - 1, move.getTo().getRow())) : rightRook);
                 rook.setPosition(new Position(rook.getPosition().getCol() == 3 ? 0 : 7, move.getTo().getRow()));
                 break;
@@ -246,13 +252,13 @@ Side.WHITE;
         }
 
         // set side
-        nextSide = oldPiece.getSide();
+        nextSide = nextSide.flip();
         Chess.getLogger().printFormat(LoggerLevel.DEBUG, "%s's turn", nextSide.toString());
 
+        history.remove(move);
         if (!inSearch)
         {
             // TODO fifty move counter / repetition position
-            history.remove(move);
         }
     }
 
@@ -268,7 +274,10 @@ Side.WHITE;
     public boolean isAttacked(Piece piece) {return isAttacked(piece.getSide().flip(), piece.getPosition());}
     public boolean isAttacked(Side attacking, Position position)
     {
-        return new ArrayList<>(pieces).stream().filter(p -> p.getSide() == attacking).anyMatch(p -> p.getPossibleMoves().stream().anyMatch(m -> m.getTo().equals(position)));
+        return new ArrayList<>(pieces).stream()
+                .filter(p -> p.getSide() == attacking)
+                .anyMatch(p -> p.getPossibleMoves().stream()
+                        .anyMatch(m -> m.getTo().equals(position)));
     }
 
     /**
@@ -318,7 +327,7 @@ Side.WHITE;
     /**
      * @return A {@link List} of all {@link Piece}'s on the {@link Board}
      */
-    public List<Piece> getPieces()
+    public ArrayList<Piece> getPieces()
     {
         return pieces;
     }
