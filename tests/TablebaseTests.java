@@ -42,6 +42,7 @@ public class TablebaseTests
     @MethodSource
     public void tablebaseRandomBoard(int blackPieces, int whitePieces)
     {
+        board.setLegitimacyChecking(false);
         do {
             board.getPieces().clear();
 
@@ -59,6 +60,7 @@ public class TablebaseTests
             for (int i = 0; i < whitePieces; i++)
                 board.getPieces().add(getRandomPiece(Side.WHITE, getRandomPosition(board)));
         } while(board.isInCheck(Side.BLACK));
+        board.setLegitimacyChecking(true);
 
         Chess.printBoard(board);
 
@@ -87,23 +89,23 @@ public class TablebaseTests
         Position from = new Position(fromEncoded % 8, 7 - (fromEncoded / 8));
         Position to = new Position(toEncoded % 8, 7 - (toEncoded / 8));
         Piece fromPiece = board.getPiece(from);
-        System.out.printf("Evaluation is %s %s %s %s", winDrawLoss, from, to, distanceToZero);
-        Assertions.assertNotEquals(null, fromPiece);
+        System.out.printf("Evaluation is %s %s %s %s\n", winDrawLoss, from, to, distanceToZero);
 
         if (board.isStalemate())
         {
             Assertions.assertEquals(SyzygyConstants.TB_DRAW, winDrawLoss);
         }
-        else if (board.isCheckMate(Side.WHITE))
+        else if (board.isCheckMate(board.getNextSide().flip()))
         {
             Assertions.assertEquals(SyzygyConstants.TB_LOSS, winDrawLoss);
         }
-        else if (board.isCheckMate(Side.BLACK))
+        else if (board.isCheckMate(board.getNextSide()))
         {
             Assertions.assertEquals(SyzygyConstants.TB_WIN, winDrawLoss);
         }
         else
         {
+            Assertions.assertNotEquals(null, fromPiece);
             Assertions.assertTrue(fromPiece.getPossibleMoves().stream().anyMatch(p -> p.getTo().equals(to)));
         }
     }
@@ -141,7 +143,11 @@ public class TablebaseTests
                 Arguments.of(0, 1),
                 Arguments.of(0, 2),
                 Arguments.of(1, 0),
-                Arguments.of(1, 1)
+                Arguments.of(1, 1),
+                Arguments.of(1, 2),
+                Arguments.of(2, 1),
+                Arguments.of(0, 3),
+                Arguments.of(3, 0)
         ).collect(() -> new ArrayList<Arguments>(), (a, b) -> {
             for (int i = 0; i < 1000; i++) a.add(b);
         }, (a, b) -> a.addAll(b)).stream();
