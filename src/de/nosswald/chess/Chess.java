@@ -2,6 +2,7 @@ package de.nosswald.chess;
 
 import de.nosswald.chess.game.Board;
 import de.nosswald.chess.gui.Frame;
+import de.nosswald.chess.gui.screen.impl.BoardScreen;
 import de.nosswald.chess.gui.screen.impl.MainMenuScreen;
 import de.nosswald.chess.logger.Logger;
 import de.nosswald.chess.logger.LoggerLevel;
@@ -48,6 +49,14 @@ public final class Chess
     public static Chess getInstance()
     {
         return instance;
+    }
+
+    public void showBoard()
+    {
+        if (getFrame() != null) throw new RuntimeException();
+
+        frame = new Frame();
+        frame.setScreen(new BoardScreen());
     }
 
     public static Logger getLogger()
