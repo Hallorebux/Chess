@@ -129,7 +129,7 @@ public abstract class Piece
                 // short castle
                 if (pseudoLegalMove.getTo().equals(new Position(6, startRow)))
                 {
-                    if (IntStream.range(4, 7) // 7 because endExclusive
+                    if (!IntStream.range(4, 7) // 7 because endExclusive
                             .anyMatch(col -> board.getPieces().stream()
                                     .filter(p -> p.side != side)
                                     .anyMatch(p -> p.getPossibleMoves().stream()
@@ -142,7 +142,7 @@ public abstract class Piece
                 // long castle
                 if (pseudoLegalMove.getTo().equals(new Position(2, startRow)))
                 {
-                    if (IntStream.range(1, 4)
+                    if (!IntStream.range(1, 4)
                             .anyMatch(col -> board.getPieces().stream()
                                     .filter(p -> p.side != side)
                                     .anyMatch(p -> p.getPossibleMoves().stream()
