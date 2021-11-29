@@ -50,6 +50,7 @@ public class PerftTests {
         PerftResults results = new PerftResults();
         recPerft(depth, results);
 
+        System.out.println(results.toString());
         Assertions.assertEquals(captures, results.getCaptures());
         Assertions.assertEquals(enPassant, results.getEnPassant());
         Assertions.assertEquals(castles, results.getCastles());
@@ -149,6 +150,19 @@ public class PerftTests {
 
         public void setCheckmate(Long checkmate) {
             this.checkmate = checkmate;
+        }
+
+        @Override
+        public String toString() {
+            return "PerftResults{" +
+                    "nodes=" + nodes +
+                    ", captures=" + captures +
+                    ", castles=" + castles +
+                    ", promotions=" + promotions +
+                    ", checks=" + checks +
+                    ", checkmate=" + checkmate +
+                    ", enPassant=" + enPassant +
+                    '}';
         }
     }
 
